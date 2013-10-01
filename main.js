@@ -1,4 +1,4 @@
-/* MCU Attend, Version 0.9.0 */
+/* MCU Attend, Version 0.9.1 */
 /* This script release under LGPL License */
 
 /* jQuery from stackoverflow: 8139794 */
@@ -32,7 +32,7 @@ var Sound = (function () {
 
 /* CSS from stackoverflow: 524696 */
 var head = document.getElementsByTagName('head')[0];
-var cssxx = 'form td:hover { background: #FFE1FF; }';
+var cssxx = 'form td:hover { background: #FFE1FF; } div.regen { display: inline-block; text-align: right; visibility: hidden; } form td:hover div.regen { visibility: visible; }';
 var mycss = document.createElement("style");
 mycss.type = 'text/css';
 if (mycss.styleSheet) {
@@ -46,6 +46,10 @@ var playSound = function (sid) {
     var s = new Sound("http://mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid);
 };
 
+var regen = function(sid, name) {
+    var s = new Sound("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name);
+}
+
 var nowid = "";
 
 loadJQ(function () {
@@ -58,10 +62,11 @@ loadJQ(function () {
                 $(this).addClass("xmcuattend");
                 nowid = this_id;
             }
+        }).each(function() {
+            var sid = $(this).find("font")[1].innerHTML;
+            var name = $($(this).find("font")[0]).text().substr(sid.length).trim();
+            $(this).prepend($("<div class=\"regen\"><a href=\"javascript:regen('" + sid + "', '" + name + "');\"><img src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a></div>"));
         });
-        /*$("form table").mouseout(function() {
-            nowid = "";
-        });*/
     });
 });
 
