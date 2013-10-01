@@ -1,3 +1,9 @@
+## 0.9.4 (2013/10/02)
+
+Features:
+
+  - add replay function
+
 ## 0.9.3 (2013/10/02)
 
 Misc:

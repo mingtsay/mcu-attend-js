@@ -2,7 +2,7 @@
     include("config.php");
 
     $tts_config = array(
-        "speaker" => "Theresa",
+        "speaker" => "Bruce",
         "volume" => 100,
         "speed" => 0,
         "output_type" => "wav",
@@ -14,10 +14,16 @@
     $db = new PDO(DB_DSN . ":host=" . DB_HOSTNAME . ";dbname=" . DB_DATABASE, DB_USERNAME, DB_PASSWORD);
     $db->exec("SET NAMES UTF8");
 
+    if (isset($_GET["name"])) {
+        $encoding = mb_detect_encoding($_GET["name"]);
+        if ($encoding != "UTF-8") $_GET["name"] = iconv("big5", "UTF-8", $_GET["name"]);
+        $_GET["name"] = str_replace("　", "", $_GET["name"]);
+    }
+
     if (isset($_GET["sid"])) {
         $sid = trim($_GET["sid"]);
 
-        if (is_numeric($sid) && strlen($sid) == 8) {
+        // if (is_numeric($sid) && strlen($sid) == 8) {
             $query = $db->prepare("SELECT * FROM `" . DB_TABLENAME . "` WHERE `sid` = :sid LIMIT 1");
             $query->bindParam(":sid", $sid);
             $query->execute();
@@ -51,7 +57,27 @@
                 }
             } else {
                 if ($data) {
-                    $wave = base64_decode($data["sound"]);
+                    if ($data["sound"] == "") {
+                        $name = $data["name"];
+                        if (false !== ($wave = getTTSWave($name))) {
+                            $sound = base64_encode($wave);
+
+                            if ($data) {
+                                $update = $db->prepare("UPDATE `" . DB_TABLENAME . "` SET `name` = :name, `sound` = :sound WHERE `sid` = :sid");
+                            } else {
+                                $update = $db->prepare("INSERT INTO `" . DB_TABLENAME . "` (`sid`, `name`, `sound`) VALUES (:sid, :name, :sound);");
+                            }
+
+                            $update->bindParam(":sid", $sid);
+                            $update->bindParam(":name", $name);
+                            $update->bindParam(":sound", $sound);
+                            $update->execute();
+                        } else if (!isset($error)) {
+                            $error = array(500, "Error while fetch TTS sound.");
+                        }
+                    } else {
+                        $wave = base64_decode($data["sound"]);
+                    }
                 } else {
                     if (isset($_GET["name"])) {
                         $name = $_GET["name"];
@@ -72,7 +98,7 @@
                         $error = array(404, "Student ID not found.");
                     }
                 }
-            }
+            // }
         } else {
             $error = array(400, "Bad Student ID.");
         }
@@ -110,9 +136,9 @@
             while (true) {
                 $q = explode("&", $tts->GetConvertStatus(TTS_USERNAME, TTS_PASSWORD, (int) $r[2]));
 
-                if (time() - $time > 90) {
-                    return false;
-                } else {
+                //if (time() - $time > 90) {
+                    //return false;
+                //} else {
                     if ((int) $q[0] != 0) {
                         return false;
                     } else {
@@ -120,7 +146,7 @@
                             return file_get_contents($q[4]);
                         }
                     }
-                }
+                //}
             }
         }
     }
