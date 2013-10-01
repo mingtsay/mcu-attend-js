@@ -1,3 +1,9 @@
+## 0.9.2 (2013/10/02)
+
+Features:
+
+  - add change function
+
 ## 0.9.1 (2013/10/02)
 
 Features:

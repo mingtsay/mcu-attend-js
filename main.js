@@ -1,4 +1,4 @@
-/* MCU Attend, Version 0.9.1 */
+/* MCU Attend, Version 0.9.2 */
 /* This script release under LGPL License */
 
 /* jQuery from stackoverflow: 8139794 */
@@ -65,7 +65,9 @@ loadJQ(function () {
         }).each(function() {
             var sid = $(this).find("font")[1].innerHTML;
             var name = $($(this).find("font")[0]).text().substr(sid.length).trim();
-            $(this).prepend($("<div class=\"regen\"><a href=\"javascript:regen('" + sid + "', '" + name + "');\"><img src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a></div>"));
+            var btn_regen = "<a href=\"javascript:regen('" + sid + "', '" + name + "');\"><img width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
+            var btn_change = "<a href=\"javascript:change('" + sid + "', '" + name + "');\"><img width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
+            $(this).prepend($("<div class=\"regen\">" + btn_change + "&nbsp;" + btn_regen + "</div>"));
         });
     });
 });

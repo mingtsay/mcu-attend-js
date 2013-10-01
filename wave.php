@@ -1,6 +1,16 @@
 <?php
     include("config.php");
 
+    $tts_config = array(
+        "speaker" => "Theresa",
+        "volume" => 100,
+        "speed" => 0,
+        "output_type" => "wav",
+        "pitch_level" => 0,
+        "pitch_sign" => 0,
+        "pitch_scale" => 5,
+    );
+
     $db = new PDO(DB_DSN . ":host=" . DB_HOSTNAME . ";dbname=" . DB_DATABASE, DB_USERNAME, DB_PASSWORD);
     $db->exec("SET NAMES UTF8");
 
@@ -12,10 +22,29 @@
             $query->bindParam(":sid", $sid);
             $query->execute();
 
-            if (false !== ($data = $query->fetch())) {
-                $wave = base64_decode($data["sound"]);
+            $data = $query->fetch();
+
+            if (isset($_GET["regen"]) && isset($_GET["name"])) {
+                $name = $_GET["name"];
+                $wave = getTTSWave($name);
+                $sound = base64_encode($wave);
+
+                if ($data) {
+                    $update = $db->prepare("UPDATE `" . DB_TABLENAME . "` SET `name` = :name, `sound` = :sound WHERE `sid` = :sid");
+                } else {
+                    $update = $db->prepare("INSERT INTO `" . DB_TABLENAME . "` (`sid`, `name`, `sound`) VALUES (:sid, :name, :sound);");
+                }
+
+                $update->bindParam(":sid", $sid);
+                $update->bindParam(":name", $name);
+                $update->bindParam(":sound", $sound);
+                $update->execute();
             } else {
-                $wave = "";
+                if ($data) {
+                    $wave = base64_decode($data["sound"]);
+                } else {
+                    $wave = "";
+                }
             }
         } else {
             $error = array(400, "Bad Student ID.");
@@ -33,5 +62,39 @@
         header("Content-Type: audio/wav");
         header("Content-Length: " . strlen($wave));
         echo($wave);
+    }
+
+    exit();
+
+    function getTTSWave($name) {
+        global $tts_config;
+
+        $tts = new SoapClient("http://tts.itri.org.tw/TTSService/Soap_1_3.php?wsdl");
+        $r = explode("&", $tts->ConvertAdvancedText(
+            TTS_USERNAME, TTS_PASSWORD, $name,
+            $tts_config["speaker"], $tts_config["volume"], $tts_config["speed"],
+            $tts_config["output_type"], $tts_config["pitch_level"], $tts_config["pitch_sign"], $tts_config["pitch_scale"]
+        ));
+
+        if ($r[0] != "0") {
+            return false;
+        } else {
+            $time = time();
+            while (true) {
+                $q = explode("&", $tts->GetConvertStatus(TTS_USERNAME, TTS_PASSWORD, $r[2]));
+
+                if (time() - $time > 90) {
+                    return false;
+                } else {
+                    if ($q[0] != "0") {
+                        return false;
+                    } else {
+                        if ($q[2] == "2") {
+                            return file_get_contents($q[4]);
+                        }
+                    }
+                }
+            }
+        }
     }
 
