@@ -1,3 +1,13 @@
+## 0.9.5 (2013/10/03)
+
+Features:
+
+  - framework supporting
+
+Bugfixes:
+
+  - encoding (big5 vs. UTF-8)
+
 ## 0.9.4 (2013/10/02)
 
 Features:
