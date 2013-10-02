@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.5 */
+/* MCU Attend, Version 0.9.6 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.5";
+var mcu_attend_version = "0.9.6";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -38,6 +38,20 @@ var Sound = (function () {
     }
 }());
 
+/**
+ * jBeep
+ *
+ * Play WAV beeps easily in javascript!
+ * Tested on all popular browsers and works perfectly, including IE6.
+ *
+ * @date 10-19-2012
+ * @license MIT
+ * @author Everton (www.ultraduz.com.br)
+ * @version 1.0
+ * @params soundFile The .WAV sound path
+ */
+window.jBeep = target_window.jBeep = function(a){if(!a)a="jBeep/jBeep.wav";var b,c,d;d=true;try{if(typeof document.createElement("audio").play=="undefined")d=false}catch(e){d=false}c=document.getElementsByTagName("body")[0];if(!c)c=document.getElementsByTagName("html")[0];b=document.getElementById("jBeep");if(b)c.removeChild(b);if(d){b=document.createElement("audio");b.setAttribute("id","jBeep");b.setAttribute("src",a);b.play()}else if(navigator.userAgent.toLowerCase().indexOf("msie")>-1){b=document.createElement("bgsound");b.setAttribute("id","jBeep");b.setAttribute("loop",1);b.setAttribute("src",a);c.appendChild(b)}else{var f;b=document.createElement("object");b.setAttribute("id","jBeep");b.setAttribute("type","audio/wav");b.setAttribute("style","display:none;");b.setAttribute("data",a);f=document.createElement("param");f.setAttribute("name","autostart");f.setAttribute("value","false");b.appendChild(f);c.appendChild(b);try{b.Play()}catch(e){b.object.Play()}}}
+
 /* CSS from stackoverflow: 524696 */
 var loadCSS = function (csstext, target_document) {
     var head = target_document.getElementsByTagName('head')[0];
@@ -59,16 +73,16 @@ if(typeof String.prototype.trim !== 'function') {
 }
 
 window.playSound = target_window.playSound = function (sid, name) {
-    var s = new Sound("http://mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+    jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
 };
 
 window.regen = target_window.regen = function(sid) {
-    var s = new Sound("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
+    jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
 }
 
 window.change = target_window.change = function(sid, name) {
     name = window.prompt("請輸入欲修改之語音內容：", name);
-    var s = new Sound("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+    jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
 };
 
 var nowid = "";
