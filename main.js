@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.6 */
+/* MCU Attend, Version 0.9.7 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.6";
+var mcu_attend_version = "0.9.7";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -109,14 +109,14 @@ loadJQ(function () {
             "#mcu_attend a:hover {" +
                 "color: #fff;" +
             "}" +
-            "form td:hover {" +
+            "form td.hover {" +
                 "background: #FFE1FF;" +
             "}" +
             "div.function_buttons {" +
                 "text-align: center;" +
                 "visibility: hidden;" +
             "}" +
-            "form td:hover div.function_buttons {" +
+            "form td.hover div.function_buttons {" +
                 "visibility: visible;" +
             "}" +
         "", target_document);
@@ -133,13 +133,28 @@ loadJQ(function () {
                 playSound(sid, name);
                 nowid = sid;
             }
+            $(this).addClass("hover");
         }).each(function() {
             var sid = $(this).find("input")[0].value.toString();
             var name = $($(this)[0]).text().trim().substr(sid.length).trim();
-            var btn_replay = "<a href=\"javascript:playSound('" + sid + "','" + name + "');\"><img width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
-            var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
-            var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
+            var btn_replay = "<a href=\"javascript:playSound('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
+            var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
+            var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
             $(this).append($("<div class=\"function_buttons\">" + btn_change + "&nbsp;" + btn_regen + "&nbsp;" + btn_replay + "</div>"));
+        }).mouseout(function() {
+            $(this).removeClass("hover");
+        });
+
+        $(target_document).find("form td input").focus(function() {
+            var sid = this.value;
+            var name = $(this).text().trim().substr(sid.length).trim();
+            if (nowid != sid) {
+                playSound(sid, name);
+                nowid = sid;
+            }
+            $(this).parents("td").addClass("hover");
+        }).blur(function() {
+            $(this).parents("td").removeClass("hover");
         });
 
         $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"http://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013</div>");

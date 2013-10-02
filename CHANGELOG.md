@@ -1,3 +1,9 @@
+## 0.9.7 (2013/10/03)
+
+Bugfixes:
+
+- function buttons won't show up in IE 6
+
 ## 0.9.6 (2013/10/03)
 
 Bugfixes:
