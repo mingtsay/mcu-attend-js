@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.7 */
+/* MCU Attend, Version 0.9.8 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.7";
+var mcu_attend_version = "0.9.8";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -85,7 +85,20 @@ window.change = target_window.change = function(sid, name) {
     jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
 };
 
-var nowid = "";
+window.replay = target_window.replay = function (sid, name, i) {
+    playSound(sid, name);
+    $(mcu_attend_list[i]).find("input").focus();
+};
+
+window.get_now_index = target_window.get_now_index = function() {
+    for (var i in mcu_attend_list) {
+        var n = mcu_attend_list[i];
+        if ($(n).find("input").is(":focus")) return i;
+    }
+    return false;
+}
+
+var mcu_attend_list = [];
 
 loadJQ(function () {
     loadJQ(function () {
@@ -109,14 +122,20 @@ loadJQ(function () {
             "#mcu_attend a:hover {" +
                 "color: #fff;" +
             "}" +
+            "form td.focus {" +
+                "background: #E1FFFF;" +
+            "}" +
             "form td.hover {" +
                 "background: #FFE1FF;" +
+            "}" +
+            "form td.hover.focus {" +
+                "background: #E1FFE1;" +
             "}" +
             "div.function_buttons {" +
                 "text-align: center;" +
                 "visibility: hidden;" +
             "}" +
-            "form td.hover div.function_buttons {" +
+            "form td.hover div.function_buttons, form td.focus div.function_buttons {" +
                 "visibility: visible;" +
             "}" +
         "", target_document);
@@ -127,41 +146,83 @@ loadJQ(function () {
         }
 
         $(target_document).find("form td").mouseover(function() {
-            var sid = $(this).find("input")[0].value;
-            var name = $($(this)[0]).text().trim().substr(sid.length).trim();
-            if (nowid != sid) {
-                playSound(sid, name);
-                nowid = sid;
-            }
             $(this).addClass("hover");
         }).each(function() {
-            var sid = $(this).find("input")[0].value.toString();
+            var sid = $(this).find("input")[0].value;
             var name = $($(this)[0]).text().trim().substr(sid.length).trim();
-            var btn_replay = "<a href=\"javascript:playSound('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
+            var btn_replay = "<a href=\"javascript:replay('" + sid + "','" + name + "', " + mcu_attend_list.length + ");\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
             var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
             var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
             $(this).append($("<div class=\"function_buttons\">" + btn_change + "&nbsp;" + btn_regen + "&nbsp;" + btn_replay + "</div>"));
+            $(this).attr("mcu_attend_sid", sid);
+            $(this).attr("mcu_attend_name", name);
+            mcu_attend_list.push(this);
         }).mouseout(function() {
             $(this).removeClass("hover");
         });
 
         $(target_document).find("form td input").focus(function() {
-            var sid = this.value;
-            var name = $(this).text().trim().substr(sid.length).trim();
-            if (nowid != sid) {
-                playSound(sid, name);
-                nowid = sid;
-            }
-            $(this).parents("td").addClass("hover");
+            $(this).parents("td").addClass("focus");
         }).blur(function() {
-            $(this).parents("td").removeClass("hover");
+            $(this).parents("td").removeClass("focus");
+        });
+
+        $(target_document).keydown(function(e) {
+            switch(e.keyCode) {
+                case 37: // left
+                case 39: // right
+                case 86: // V
+                case 66: // B
+                case 78: // N
+                    break;
+                default: return;
+            }
+
+            var play_me = false;
+            var now_index = get_now_index();
+            if (now_index === false) {
+                now_index = 0;
+            } else {
+                if (!mcu_attend_list.length) {
+                    now_index = -1;
+                } else {
+                    switch (e.keyCode) {
+                        case 66: // B(ack)
+                            play_me = true;
+                        case 37: // left
+                            --now_index;
+                            break;
+                        case 78: // N(ext)
+                            play_me = true;
+                        case 39: // right
+                            ++now_index;
+                            break;
+                        case 86: // V(oice)
+                            play_me = true;
+                            break;
+                    }
+                }
+            }
+
+            if (now_index >= 0 && now_index < mcu_attend_list.length) {
+                var t = mcu_attend_list[now_index];
+                var input = $(t).find("input")[0];
+                var sid = $(t).attr("mcu_attend_sid");
+                var name = $(t).attr("mcu_attend_name");
+                $(input).focus();
+                if (play_me) playSound(sid, name);
+            }
+
+            e.preventDefault();
         });
 
         $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"http://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013</div>");
 
         window.alert(
             "唱名程式 v" + mcu_attend_version + "已成功載入！\n\n" +
-            "使用方法：\n僅需將滑鼠移動至學生姓名上方即可。\n\n" +
+            "使用方法：\n以滑鼠點擊播放按鈕，或使用鍵盤Tab鍵來唱名。以空白鍵(Space)選取缺課學生。\n\n" +
+            "　　　　　\n亦可使用下列鍵盤的按鍵操作本系統：V播放、B上一位學生**並播放**、N下一位學生**並播放**。\n\n" +
+            "　　　　　\n用滑鼠按下播放按鈕後，游標焦點將會移至核取方塊。\n\n" +
             "障礙排除：\n" +
             "若唸出來的發音錯誤，可點選「修改發音內容」以同音字來發音。\n" +
             "若無法正常唸出姓名，可點選「重新播放音訊檔案」或「重新產生音訊檔案」。\n\n" +
@@ -169,4 +230,4 @@ loadJQ(function () {
             "Developed by Ming Tsay. 2013"
         );
     }, target_document);
-}, document);
+}, document); 

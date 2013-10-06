@@ -1,14 +1,22 @@
+## 0.9.8 (2013/10/07)
+
+Features:
+
+  - now function can be accessed by keyboard
+  - we don't want to play when mouse is over
+  - update initial message text
+
 ## 0.9.7 (2013/10/03)
 
 Bugfixes:
 
-- function buttons won't show up in IE 6
+  - function buttons won't show up in IE 6
 
 ## 0.9.6 (2013/10/03)
 
 Bugfixes:
 
-- using jBeep to play wave files instead
+  - using jBeep to play wave files instead
 
 ## 0.9.5 (2013/10/03)
 
