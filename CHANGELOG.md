@@ -1,3 +1,9 @@
+## 0.9.8.1 (2013/10/08)
+
+Bugfixes:
+
+  - don't play when name is null
+
 ## 0.9.8 (2013/10/07)
 
 Features:

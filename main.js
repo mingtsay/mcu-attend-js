@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.8 */
+/* MCU Attend, Version 0.9.8.1 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.8";
+var mcu_attend_version = "0.9.8.1";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -82,6 +82,7 @@ window.regen = target_window.regen = function(sid) {
 
 window.change = target_window.change = function(sid, name) {
     name = window.prompt("請輸入欲修改之語音內容：", name);
+    if (name === null) return;
     jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
 };
 
