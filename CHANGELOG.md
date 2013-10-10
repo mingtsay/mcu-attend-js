@@ -1,3 +1,15 @@
+## 0.9.9 (2013/10/11)
+
+Features:
+
+  - supporting arrow up and down
+  - selecting when mouse clicking
+  - add unselect function (for selecting attending student)
+  - update initial message text
+
+Bugfixes:
+  - changing behavior of frames and https
+
 ## 0.9.8.1 (2013/10/08)
 
 Bugfixes:
@@ -28,7 +40,7 @@ Bugfixes:
 
 Features:
 
-  - framework supporting
+  - frames supporting
 
 Bugfixes:
 
