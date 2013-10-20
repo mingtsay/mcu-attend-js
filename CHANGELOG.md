@@ -1,8 +1,15 @@
+## 0.9.9.1 (2013/10/21)
+
+Features:
+
+  - supporting Tab, H, J, K keys
+  - add keyboard usage
+
 ## 0.9.9 (2013/10/11)
 
 Features:
 
-  - supporting arrow up and down
+  - supporting arrow up and down keys
   - selecting when mouse clicking
   - add unselect function (for selecting attending student)
   - update initial message text

@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.9 */
+/* MCU Attend, Version 0.9.9.1 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.9";
+var mcu_attend_version = "0.9.9.1";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -57,7 +57,7 @@ if (typeof window.mainFrame !== 'undefined') {
      * @version 1.0
      * @params soundFile The .WAV sound path
      */
-    window.jBeep = target_window.jBeep = function(a){if(!a)a="jBeep/jBeep.wav";var b,c,d;d=true;try{if(typeof document.createElement("audio").play=="undefined")d=false}catch(e){d=false}c=document.getElementsByTagName("body")[0];if(!c)c=document.getElementsByTagName("html")[0];b=document.getElementById("jBeep");if(b)c.removeChild(b);if(d){b=document.createElement("audio");b.setAttribute("id","jBeep");b.setAttribute("src",a);b.play()}else if(navigator.userAgent.toLowerCase().indexOf("msie")>-1){b=document.createElement("bgsound");b.setAttribute("id","jBeep");b.setAttribute("loop",1);b.setAttribute("src",a);c.appendChild(b)}else{var f;b=document.createElement("object");b.setAttribute("id","jBeep");b.setAttribute("type","audio/wav");b.setAttribute("style","display:none;");b.setAttribute("data",a);f=document.createElement("param");f.setAttribute("name","autostart");f.setAttribute("value","false");b.appendChild(f);c.appendChild(b);try{b.Play()}catch(e){b.object.Play()}}}
+    window.jBeep = target_window.jBeep = function(a){if(!a)a="jBeep/jBeep.wav";var b,c,d;d=true;try{if(typeof document.createElement("audio").play=="undefined")d=false}catch(e){d=false}c=document.getElementsByTagName("body")[0];if(!c)c=document.getElementsByTagName("html")[0];b=document.getElementById("jBeep");if(b)c.removeChild(b);if(d){b=document.createElement("audio");b.setAttribute("id","jBeep");b.setAttribute("src",a);b.play()}else if(navigator.userAgent.toLowerCase().indexOf("msie")>-1){b=document.createElement("bgsound");b.setAttribute("id","jBeep");b.setAttribute("loop",1);b.setAttribute("src",a);c.appendChild(b)}else{var f;b=document.createElement("object");b.setAttribute("id","jBeep");b.setAttribute("type","audio/wav");b.setAttribute("style","display:none;");b.setAttribute("data",a);f=document.createElement("param");f.setAttribute("name","autostart");f.setAttribute("value","false");b.appendChild(f);c.appendChild(b);try{b.Play()}catch(e){b.object.Play()}}};
 
     /* CSS from stackoverflow: 524696 */
     var loadCSS = function (csstext, target_document) {
@@ -70,7 +70,7 @@ if (typeof window.mainFrame !== 'undefined') {
             mycss.appendChild(target_document.createTextNode(csstext));
         }
         head.appendChild(mycss);
-    }
+    };
 
     /* trim support for IE from stackoverflow: 2308134 */
     if(typeof String.prototype.trim !== 'function') {
@@ -85,7 +85,7 @@ if (typeof window.mainFrame !== 'undefined') {
 
     var regen = function(sid) {
         jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
-    }
+    };
 
     var change = function(sid, name) {
         name = window.prompt("請輸入欲修改之語音內容：", name);
@@ -105,15 +105,19 @@ if (typeof window.mainFrame !== 'undefined') {
         }
 
         if (global_now_index != -1) return global_now_index;
-        return false;
-    }
+        return -1;
+    };
 
     var reverse = function() {
         for (var i in mcu_attend_list) {
             var input = $(mcu_attend_list[i]).find("input")[0];
             input.checked = !input.checked;
         }
-    }
+    };
+
+    var toggle_keyboard = function() {
+        $("#mcu_attend_keyboard_content").toggleClass("toggle_hidden");
+    };
 
     var mcu_attend_list = [];
     var global_now_index = -1;
@@ -139,6 +143,22 @@ if (typeof window.mainFrame !== 'undefined') {
                 "}" +
                 "#mcu_attend a:hover {" +
                     "color: #fff;" +
+                "}" +
+                "#mcu_attend_keyboard {" +
+                    "text-align: center;" +
+                    "padding: 5px;" +
+                    "margin: 5px;" +
+                    "background: #099;" +
+                    "color: #cff;" +
+                    "text-decoration: none;" +
+                    "display: block;" +
+                "}" +
+                "#mcu_attend_keyboard_content {" +
+                    "text-align: left;" +
+                    "color: #cff;" +
+                "}" +
+                "#mcu_attend_keyboard_content.toggle_hidden {" +
+                    "display: none;" +
                 "}" +
                 "#mcu_attend_reverse {" +
                     "text-align: center;" +
@@ -202,70 +222,60 @@ if (typeof window.mainFrame !== 'undefined') {
 
             $(target_document).find("form td input").focus(function() {
                 $(this).parents("td").addClass("focus");
-                global_now_index = parseInt($(this).attr("mcu_attend_index"), 10);
+                global_now_index = parseInt($(this).parents("td").attr("mcu_attend_index"), 10);
             }).blur(function() {
                 $(this).parents("td").removeClass("focus");
-                if (global_now_index == parseInt($(this).attr("mcu_attend_index"), 10)) {
+                if (global_now_index == parseInt($(this).parents("td").attr("mcu_attend_index"), 10)) {
                     global_now_index = -1;
                 }
             });
 
             $(target_document).keydown(function(e) {
+                var play_me = false, action = 0;
                 switch(e.keyCode) {
-                    case 37: // left
+                    case  9: // tab
+                        play_me = true;
+                        action = (e.shiftKey ? -1 : 1);
+                        break;
                     case 38: // up
-                    case 39: // right
+                        action = -7;
+                        break;
                     case 40: // down
-                    case 86: // V
+                        action = 7;
+                        break;
                     case 66: // B
+                    case 72: // H
+                        play_me = true;
+                    case 37: // left
+                        action = -1;
+                        break;
                     case 78: // N
+                    case 75: // K
+                        play_me = true;
+                    case 39: // right
+                        action = 1;
+                        break;
+                    case 86: // V
+                    case 74: // J
+                        play_me = true;
                         break;
                     default: return;
                 }
 
-                var play_me = false;
-                var now_index = get_now_index();
-                if (now_index === false) {
-                    switch (e.keyCode) {
-                        case 66: // B(ack)
-                            play_me = true;
-                        case 37: // left
-                        case 38: // up
-                            now_index = mcu_attend_list.length - 1;
-                            break;
-                        case 78: // N(ext)
-                            play_me = true;
-                        case 39: // right
-                        case 40: // down
-                            now_index = 0;
-                            break;
+                var now_index = parseInt(get_now_index(), 10);
+                if (now_index == -1) {
+                    if (action < 0) {
+                        now_index = mcu_attend_list.length - 1;
+                    } else if (action > 0) {
+                        now_index = 0;
+                    } else {
+                        now_index = -1;
                     }
                 } else {
-                    now_index = parseInt(now_index, 10);
                     if (!mcu_attend_list.length) {
                         now_index = -1;
                     } else {
-                        switch (e.keyCode) {
-                            case 66: // B(ack)
-                                play_me = true;
-                            case 37: // left
-                                --now_index;
-                                break;
-                            case 78: // N(ext)
-                                play_me = true;
-                            case 39: // right
-                                ++now_index;
-                                break;
-                            case 38: // up
-                                now_index -= 7;
-                                break;
-                            case 40: // down
-                                now_index += 7;
-                                break;
-                            case 86: // V(oice)
-                                play_me = true;
-                                break;
-                        }
+                        now_index += action;
                     }
                 }
 
@@ -284,12 +294,12 @@ if (typeof window.mainFrame !== 'undefined') {
                 e.preventDefault();
             });
 
-            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"http://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013</div><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div>");
+            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"http://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013</div><a  id=\"mcu_attend_keyboard\" href=\"javascript:toggle_keyboard();\">鍵盤對應功能表（展開/收回）<div id=\"mcu_attend_keyboard_content\" class=\"toggle_hidden\"><ul><li>方向鍵：不播放選擇學生</li><li>Space：選取/取消選取目前學生缺席</li><li>Tab/N/K：播放下一位學生姓名</li><li>Shift+Tab/B/H：播放上一位學生姓名</li><li>V/J：播放目前學生姓名</li></ul></div></a><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div>");
 
             window.alert(
                 "唱名程式 v" + mcu_attend_version + "已成功載入！\n\n" +
                 "使用方法：\n以滑鼠點擊播放按鈕，或使用鍵盤方向鍵來選擇學生，以空白鍵(Space)選取缺課學生。\n" +
-                "　　　　　\n亦可使用下列鍵盤的按鍵操作本系統：V播放、B上一位學生【並播放】、N下一位學生【並播放】。\n" +
+                "　　　　　\n亦可使用下列鍵盤的按鍵操作本系統：Tab, V, B, N, H, J, K\n" +
                 "　　　　　\n用滑鼠按下播放按鈕後，游標焦點將會移至核取方塊。\n\n" +
                 "障礙排除：\n" +
                 "若唸出來的發音錯誤，可點選「修改發音內容」以同音字來發音。\n" +
