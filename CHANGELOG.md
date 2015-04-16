@@ -1,3 +1,9 @@
+## Version 0.10.1 (2015/04/16)
+
+Features:
+
+  - add saying nocoming function
+
 ## Version 0.10.0 (2015/04/16)
 
 Features:
