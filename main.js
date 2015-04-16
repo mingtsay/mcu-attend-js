@@ -1,7 +1,7 @@
-/* MCU Attend, Version 0.9.9.2 */
+/* MCU Attend, Version 0.10.0 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.9.2";
+var mcu_attend_version = "0.10.0";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
@@ -19,7 +19,7 @@ if (typeof window.mainFrame !== 'undefined') {
         } else {
             var head = target_document.getElementsByTagName('head')[0];
             var jq = target_document.createElement('script');
-            jq.src = '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js';
+            jq.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js';
             jq.type = 'text/javascript';
             jq.onload = jq.onreadystatechange = function() {
                 if (jq.readyState) {
@@ -80,17 +80,17 @@ if (typeof window.mainFrame !== 'undefined') {
     }
 
     var playSound = function (sid, name) {
-        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+        jBeep("https://mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
     };
 
     var regen = function(sid) {
-        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
+        jBeep("https://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
     };
 
     var change = function(sid, name) {
         name = window.prompt("請輸入欲修改之語音內容：", name);
         if (name === null) return;
-        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+        jBeep("https://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
     };
 
     var replay = function (sid, name, i) {
@@ -113,6 +113,47 @@ if (typeof window.mainFrame !== 'undefined') {
             var input = $(mcu_attend_list[i]).find("input")[0];
             input.checked = !input.checked;
         }
+    };
+
+    var player_flag = false;
+
+    var player = function() {
+        player_flag = true;
+
+        playSound("player_begin", "以下念到的同學維缺席，若有登記錯誤的同學，請於播放完畢後向老師進行確認。");
+
+        setTimeout(function() {
+            var player_index = 0,
+                player_input = null,
+                player_interval = setInterval(function() {
+                    if (player_index >= mcu_attend_list.length || !player_flag) {
+                        clearInterval(player_interval);
+                        return;
+                    }
+
+                    player_input = $(mcu_attend_list[player_index]).find("input")[0];
+
+                    while (player_index < mcu_attend_list.length && player_flag && !player_input.checked) {
+                        player_input = $(mcu_attend_list[++player_index]).find("input")[0];
+                    }
+
+                    if (player_index >= mcu_attend_list.length || !player_flag) {
+                        clearInterval(player_interval);
+                        return;
+                    }
+
+                    var sid = $(mcu_attend_list[player_index]).attr("mcu_attend_sid");
+                    var name = $(mcu_attend_list[player_index]).attr("mcu_attend_name");
+                    $(player_input).focus();
+                    playSound(sid, name);
+
+                    ++player_index;
+                }, 1000);
+        }, 12000);
+    };
+
+    var player_stop = function() {
+        player_flag = false;
     };
 
     var toggle_keyboard = function() {
@@ -174,6 +215,20 @@ if (typeof window.mainFrame !== 'undefined') {
                 "#mcu_attend_reverse a:hover {" +
                     "color: #06f;" +
                 "}" +
+                "#mcu_attend_player {" +
+                    "text-align: center;" +
+                    "padding: 5px;" +
+                    "margin: 5px;" +
+                    "background: #c6f;" +
+                    "color: #eee;" +
+                "}" +
+                "#mcu_attend_player a {" +
+                    "color: #cfe;" +
+                    "text-decoration: none;" +
+                "}" +
+                "#mcu_attend_player a:hover {" +
+                    "color: #0fa;" +
+                "}" +
                 "form td.focus {" +
                     "background: #E1FFFF;" +
                 "}" +
@@ -210,9 +265,9 @@ if (typeof window.mainFrame !== 'undefined') {
             }).each(function() {
                 var sid = $(this).find("input")[0].value;
                 var name = $($(this)[0]).text().trim().substr(sid.length).trim();
-                var btn_replay = "<a href=\"javascript:replay('" + sid + "','" + name + "', " + mcu_attend_list.length + ");\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
-                var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
-                var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
+                var btn_replay = "<a href=\"javascript:replay('" + sid + "','" + name + "', " + mcu_attend_list.length + ");\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"https://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
+                var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"https://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
+                var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"https://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
                 $(this).append($("<div class=\"function_buttons\">" + btn_change + "&nbsp;" + btn_regen + "&nbsp;" + btn_replay + "</div>"));
                 $(this).attr("mcu_attend_index", mcu_attend_list.length);
                 $(this).attr("mcu_attend_sid", sid);
@@ -294,7 +349,7 @@ if (typeof window.mainFrame !== 'undefined') {
                 e.preventDefault();
             });
 
-            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"//mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013-2015</div><a  id=\"mcu_attend_keyboard\" href=\"javascript:toggle_keyboard();\">鍵盤對應功能表（展開/收回）<div id=\"mcu_attend_keyboard_content\" class=\"toggle_hidden\"><ul><li>方向鍵：不播放選擇學生</li><li>Space：選取/取消選取目前學生缺席</li><li>Tab/N/K：播放下一位學生姓名</li><li>Shift+Tab/B/H：播放上一位學生姓名</li><li>V/J：播放目前學生姓名</li></ul></div></a><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div>");
+            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"https://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013-2015</div><a  id=\"mcu_attend_keyboard\" href=\"javascript:toggle_keyboard();\">鍵盤對應功能表（展開/收回）<div id=\"mcu_attend_keyboard_content\" class=\"toggle_hidden\"><ul><li>方向鍵：不播放選擇學生</li><li>Space：選取/取消選取目前學生缺席</li><li>Tab/N/K：播放下一位學生姓名</li><li>Shift+Tab/B/H：播放上一位學生姓名</li><li>V/J：播放目前學生姓名</li></ul></div></a><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div><div id=\"mcu_attend_player\"><a href=\"javascript:player();\">播放所有缺席學生姓名</a> / <a href=\"javascript:player_stop();\">停止播放</a></div>");
 
             window.alert(
                 "唱名程式 v" + mcu_attend_version + "已成功載入！\n\n" +

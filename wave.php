@@ -98,10 +98,10 @@
                         $error = array(404, "Student ID not found.");
                     }
                 }
-            // }
-        } else {
-            $error = array(400, "Bad Student ID.");
-        }
+            }
+        // } else {
+        //    $error = array(400, "Bad Student ID.");
+        // }
     } else {
         $error = array(400, "Please specify the Student ID by HTTP get.");
     }
