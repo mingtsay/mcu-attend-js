@@ -1,16 +1,16 @@
-/* MCU Attend, Version 0.9.9.1 */
+/* MCU Attend, Version 0.9.9.2 */
 /* This script release under LGPL License */
 
-var mcu_attend_version = "0.9.9.1";
+var mcu_attend_version = "0.9.9.2";
 var target_window = (typeof window.mainFrame === 'undefined' ? window : window.mainFrame);
 var target_document = target_window.document;
 
 if (typeof window.mainFrame !== 'undefined') {
     if (confirm("唱名程式不支援有框架頁的點名系統，是否自動切換至無框架的頁面？\n您只需要按下確定後重新載入此唱名程式即可使用。"))
         window.location.href = (window.location.protocol == "https:" ? "http:" : window.mainFrame.location.protocol) + window.mainFrame.location.href.substring(window.mainFrame.location.protocol.length);
-} else if (window.location.protocol == "https:") { /* force HTTP from stackoverflow: 4723213 */
-    if (confirm("唱名程式不能於HTTPS的模式下執行，是否自動切換至HTTP模式？\n您只需要按下確定後重新載入此唱名程式即可使用。"))
-        window.location.href = "http:" + window.location.href.substring(window.location.protocol.length);
+// } else if (window.location.protocol == "https:") { /* force HTTP from stackoverflow: 4723213 */
+//    if (confirm("唱名程式不能於HTTPS的模式下執行，是否自動切換至HTTP模式？\n您只需要按下確定後重新載入此唱名程式即可使用。"))
+//        window.location.href = "http:" + window.location.href.substring(window.location.protocol.length);
 } else {
     /* jQuery from stackoverflow: 8139794 */
     var loadJQ = function (onload, target_document) {
@@ -19,7 +19,7 @@ if (typeof window.mainFrame !== 'undefined') {
         } else {
             var head = target_document.getElementsByTagName('head')[0];
             var jq = target_document.createElement('script');
-            jq.src = 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js';
+            jq.src = '//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js';
             jq.type = 'text/javascript';
             jq.onload = jq.onreadystatechange = function() {
                 if (jq.readyState) {
@@ -80,17 +80,17 @@ if (typeof window.mainFrame !== 'undefined') {
     }
 
     var playSound = function (sid, name) {
-        jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
     };
 
     var regen = function(sid) {
-        jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
+        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&dummy=" + (new Date().getTime()));
     };
 
     var change = function(sid, name) {
         name = window.prompt("請輸入欲修改之語音內容：", name);
         if (name === null) return;
-        jBeep("http://mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
+        jBeep("//mt.rmstudio.tw/mcu_attend/wave.php?regen&sid=" + sid + "&name=" + name + "&dummy=" + (new Date().getTime()));
     };
 
     var replay = function (sid, name, i) {
@@ -210,9 +210,9 @@ if (typeof window.mainFrame !== 'undefined') {
             }).each(function() {
                 var sid = $(this).find("input")[0].value;
                 var name = $($(this)[0]).text().trim().substr(sid.length).trim();
-                var btn_replay = "<a href=\"javascript:replay('" + sid + "','" + name + "', " + mcu_attend_list.length + ");\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
-                var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
-                var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"http://mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
+                var btn_replay = "<a href=\"javascript:replay('" + sid + "','" + name + "', " + mcu_attend_list.length + ");\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/replay.png\" title=\"重新播放音訊檔案\" alt=\"replay\" /></a>";
+                var btn_regen = "<a href=\"javascript:regen('" + sid + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/regen.png\" title=\"重新產生音訊檔案\" alt=\"regen\" /></a>";
+                var btn_change = "<a href=\"javascript:change('" + sid + "','" + name + "');\"><img border=\"0\" width=\"16px\" height=\"16px\" src=\"//mt.rmstudio.tw/mcu_attend/images/change.png\" title=\"修改發音內容\" alt=\"change\" /></a>";
                 $(this).append($("<div class=\"function_buttons\">" + btn_change + "&nbsp;" + btn_regen + "&nbsp;" + btn_replay + "</div>"));
                 $(this).attr("mcu_attend_index", mcu_attend_list.length);
                 $(this).attr("mcu_attend_sid", sid);
@@ -294,7 +294,7 @@ if (typeof window.mainFrame !== 'undefined') {
                 e.preventDefault();
             });
 
-            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"http://mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013</div><a  id=\"mcu_attend_keyboard\" href=\"javascript:toggle_keyboard();\">鍵盤對應功能表（展開/收回）<div id=\"mcu_attend_keyboard_content\" class=\"toggle_hidden\"><ul><li>方向鍵：不播放選擇學生</li><li>Space：選取/取消選取目前學生缺席</li><li>Tab/N/K：播放下一位學生姓名</li><li>Shift+Tab/B/H：播放上一位學生姓名</li><li>V/J：播放目前學生姓名</li></ul></div></a><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div>");
+            $(target_document).find("form").prepend("<div id=\"mcu_attend\">外掛已載入：<a href=\"//mt.rmstudio.tw/mcu_attend\" target=\"_blank\" title=\"瀏覽唱名程式專案網頁（另開新視窗）\">唱名程式</a> v" + mcu_attend_version + " Developed by Ming Tsay. 2013-2015</div><a  id=\"mcu_attend_keyboard\" href=\"javascript:toggle_keyboard();\">鍵盤對應功能表（展開/收回）<div id=\"mcu_attend_keyboard_content\" class=\"toggle_hidden\"><ul><li>方向鍵：不播放選擇學生</li><li>Space：選取/取消選取目前學生缺席</li><li>Tab/N/K：播放下一位學生姓名</li><li>Shift+Tab/B/H：播放上一位學生姓名</li><li>V/J：播放目前學生姓名</li></ul></div></a><div id=\"mcu_attend_reverse\">您可以先選取有出席的學生並點選 <a href=\"javascript:reverse();\">反向選取</a> 來選擇缺課的學生。</div>");
 
             window.alert(
                 "唱名程式 v" + mcu_attend_version + "已成功載入！\n\n" +
@@ -305,7 +305,7 @@ if (typeof window.mainFrame !== 'undefined') {
                 "若唸出來的發音錯誤，可點選「修改發音內容」以同音字來發音。\n" +
                 "若無法正常唸出姓名，可點選「重新播放音訊檔案」或「重新產生音訊檔案」。\n\n" +
                 "本程式以 LGPL v3.0 授權釋出，請依授權指示來使用本程式。\n" +
-                "Developed by Ming Tsay. 2013"
+                "Developed by Ming Tsay. 2013-2015"
             );
         }, target_document);
     }, document);

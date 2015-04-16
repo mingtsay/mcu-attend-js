@@ -1,3 +1,9 @@
+## 0.9.9.2 (2015/04/16)
+
+Bugfixes:
+
+  - changing behavior of https
+
 ## 0.9.9.1 (2013/10/21)
 
 Features:
@@ -15,6 +21,7 @@ Features:
   - update initial message text
 
 Bugfixes:
+
   - changing behavior of frames and https
 
 ## 0.9.8.1 (2013/10/08)
